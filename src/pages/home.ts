@@ -113,6 +113,9 @@ export const home = () => {
     const links = allInputs.map(
       (input) => input.closest('[data-asset-parent]')?.querySelector('[data-download=link]')?.href
     );
+
+    const zipFileName = 'all_realamericanhardwood.zip';
+    downloadFilesAsZip(links, zipFileName);
   });
 
   downloadSelectedTrigger.addEventListener('click', () => {
@@ -120,6 +123,9 @@ export const home = () => {
     const links = selectedInputs.map(
       (input) => input.closest('[data-asset-parent]')?.querySelector('[data-download=link]')?.href
     );
+
+    const zipFileName = 'selected_realamericanhardwood.zip';
+    downloadFilesAsZip(links, zipFileName);
   });
 
   function getInputs(
@@ -139,15 +145,25 @@ export const home = () => {
     return checkedInputs;
   }
 
-  async function downloadUrlsAsZip(urls: string[], zipFileName: string): Promise<void> {
+  async function downloadFilesAsZip(fileUrls: string[], zipFileName = 'files.zip'): Promise<void> {
     const zip = new JSZip();
-    const promises = urls.map(async (url) => {
+
+    // Download each file and add it to the zip
+    const downloadPromises = fileUrls.map(async (url, index) => {
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to download file at ${url}`);
+      }
+
       const blob = await response.blob();
-      const fileName = url.substring(url.lastIndexOf('/') + 1);
+      const fileName = `file_${index + 1}.${blob.type.split('/')[1]}`; // Create a generic file name with the correct extension
       zip.file(fileName, blob);
     });
-    await Promise.all(promises);
+
+    // Wait for all files to be downloaded and added to the zip
+    await Promise.all(downloadPromises);
+
+    // Generate the zip file and save it on the client's computer
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     saveAs(zipBlob, zipFileName);
   }
