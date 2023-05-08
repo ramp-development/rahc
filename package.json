@@ -52,6 +52,9 @@
     "typescript": "^5.0.3"
   },
   "dependencies": {
-    "@finsweet/ts-utils": "^0.39.1"
+    "@finsweet/ts-utils": "^0.39.1",
+    "file-saver": "^2.0.5",
+    "gsap": "^3.11.5",
+    "jszip": "^3.10.1"
   }
 }
