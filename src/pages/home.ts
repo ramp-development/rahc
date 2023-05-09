@@ -1,4 +1,7 @@
+import { simulateEvent } from '@finsweet/ts-utils';
+import Splide from '@splidejs/splide';
 import { saveAs } from 'file-saver';
+import { link } from 'fs';
 import JSZip from 'jszip';
 
 export const home = () => {
@@ -12,12 +15,20 @@ export const home = () => {
   const downloadModalTrigger = document.querySelector<HTMLDivElement>(
     '[data-download="modal-trigger"]'
   );
-  const downloadFolderTrigger = document.querySelector<HTMLDivElement>('[data-download="folder"]');
-  const downloadAssetTrigger = document.querySelector<HTMLDivElement>('[data-download="asset"]');
+  const downloadPreviewTrigger = document.querySelector<HTMLDivElement>(
+    '[data-download="preview-trigger"]'
+  );
+  const downloadFolderTrigger = [
+    ...document.querySelectorAll<HTMLDivElement>('[data-download="folder"]'),
+  ];
+  const downloadAssetTrigger = [
+    ...document.querySelectorAll<HTMLDivElement>('[data-download="asset"]'),
+  ];
   if (
     !downloadAllTrigger ||
     !downloadSelectedTrigger ||
     !downloadModalTrigger ||
+    !downloadPreviewTrigger ||
     !downloadFolderTrigger ||
     !downloadAssetTrigger
   )
@@ -98,36 +109,60 @@ export const home = () => {
     }
   }
 
-  // handle download buttons
-  // /**
-  //  * data-download
-  //  * ...all / download all assets
-  //  * ...selected / download selected assets
-  //  * ...form / return
-  //  * ...folder / download all assets in folder
-  //  * ...asset / download singular asset
-  //  */
-
+  // download triggers
+  // all
   downloadAllTrigger.addEventListener('click', () => {
     const allInputs = getInputs(false);
     const links = allInputs.map(
       (input) => input.closest('[data-asset-parent]')?.querySelector('[data-download=link]')?.href
     );
 
-    const zipFileName = 'all_realamericanhardwood.zip';
-    downloadFilesAsZip(links, zipFileName);
+    downloadAssetsFlow(links, 'all_realamericanhardwood.zip');
   });
 
+  // selected
   downloadSelectedTrigger.addEventListener('click', () => {
     const selectedInputs = getInputs(true);
     const links = selectedInputs.map(
       (input) => input.closest('[data-asset-parent]')?.querySelector('[data-download=link]')?.href
     );
 
-    const zipFileName = 'selected_realamericanhardwood.zip';
-    downloadFilesAsZip(links, zipFileName);
+    downloadAssetsFlow(links, 'selected_realamericanhardwood.zip');
   });
 
+  // folder
+  downloadFolderTrigger.forEach((trigger) => {
+    const parent = trigger.closest<HTMLDivElement>('[data-folder-level]');
+    if (!parent) return;
+
+    trigger.addEventListener('click', () => {
+      const inputs = getInputs(false, parent);
+      const links = inputs.map(
+        (input) =>
+          input.closest('[data-folder-parent]')?.querySelector('[data-download=link]')?.href
+      );
+
+      downloadAssetsFlow(links, 'folder_realamericanhardwood.zip');
+    });
+  });
+
+  // asset
+  downloadAssetTrigger.forEach((trigger) => {
+    const parent = trigger.closest<HTMLDivElement>('[data-asset-parent]');
+    if (!parent) return;
+
+    trigger.addEventListener('click', () => {
+      const inputs = getInputs(false, parent);
+      const links = inputs.map(
+        (input) =>
+          input.closest('[data-folder-parent]')?.querySelector('[data-download=link]')?.href
+      );
+
+      downloadAssetsFlow(links, 'asset_realamericanhardwood.zip');
+    });
+  });
+
+  // get inputs
   function getInputs(
     checked: boolean,
     parent?: HTMLFormElement | HTMLDivElement
@@ -145,6 +180,36 @@ export const home = () => {
     return checkedInputs;
   }
 
+  // download flow
+  function downloadAssetsFlow(fileUrls: string[], zipFileName = 'files.zip'): void {
+    // check if the form has been submitted
+    const hasSubmitted = localStorage.getItem('toolkitFormSubmitted');
+
+    // download the assets if it has
+    if (hasSubmitted) {
+      downloadAssetsAsZip(fileUrls, zipFileName);
+      return;
+    }
+
+    // open the form if not
+    simulateEvent(downloadModalTrigger, 'click');
+
+    // listen for form submission
+    toolkitForm?.addEventListener('submit', () => {
+      // save to local storage
+      localStorage.setItem('toolkitFormSubmitted', 'true');
+
+      // download assets
+      downloadAssetsAsZip(fileUrls, zipFileName);
+    });
+  }
+
+  // download assets
+  function downloadAssetsAsZip(fileUrls: string[], zipFileName = 'files.zip'): void {
+    alert('DOWNLOADING ASSETS');
+  }
+
+  // save function for future use
   async function downloadFilesAsZip(fileUrls: string[], zipFileName = 'files.zip'): Promise<void> {
     const zip = new JSZip();
 
@@ -168,17 +233,44 @@ export const home = () => {
     saveAs(zipBlob, zipFileName);
   }
 
-  /**
-   * Plan
-   * If the user clicks all or selected, run function
-   * If they select a folder or asset, run other function
-   */
+  // prep preview slider
+  const splide = new Splide('.splide', {
+    pagination: false,
+    perPage: 1,
+    perMove: 1,
+  });
 
-  /**
-   * Plan
-   * 1. On click of download, get all checked inputs
-   * 2. Check if user has already submitted the form in the past
-   * 3. If no, open the form
-   * 4. Once the form has been submitted, download the assets
-   */
+  splide.mount();
+
+  const previewTriggers = [
+    ...document.querySelectorAll<HTMLDivElement>('[data-preview="folder"], [data-preview="asset"]'),
+  ];
+
+  const previewLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-preview="asset"]')];
+
+  previewTriggers.forEach((trigger) => {
+    const type = trigger.dataset.preview;
+
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      let assetLink = trigger;
+
+      if (type === 'folder') {
+        const parent = trigger.closest<HTMLDivElement>('[data-folder-level]');
+        assetLink = parent?.querySelector<HTMLAnchorElement>('[data-preview="asset"]');
+      }
+
+      const index = previewLinks.findIndex((link) => {
+        return link.href === assetLink.href;
+      });
+
+      simulateEvent(downloadPreviewTrigger, 'click');
+      setTimeout(() => {
+        splide.go(index);
+      }, 10);
+    });
+  });
 };

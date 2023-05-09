@@ -1,6 +1,6 @@
 import { initNav } from './nav';
 
 export const components = () => {
-  const nav = document.querySelector('.nav_component');
-  initNav(nav);
+  const nav = document.querySelector<HTMLDivElement>('.nav_component');
+  if (nav) initNav(nav);
 };
