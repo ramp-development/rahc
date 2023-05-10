@@ -1,34 +1,31 @@
 import { simulateEvent } from '@finsweet/ts-utils';
 import Splide from '@splidejs/splide';
-import { saveAs } from 'file-saver';
-import { link } from 'fs';
-import JSZip from 'jszip';
 
 export const home = () => {
   console.log('home');
 
   // get reference to elements
   const downloadAllTrigger = document.querySelector<HTMLAnchorElement>('[data-download="all"]');
-  const downloadSelectedTrigger = document.querySelector<HTMLAnchorElement>(
+  const downloadSelectedTrigger = document.querySelector<HTMLDivElement>(
     '[data-download="selected"]'
-  );
-  const downloadModalTrigger = document.querySelector<HTMLDivElement>(
-    '[data-download="modal-trigger"]'
   );
   const downloadPreviewTrigger = document.querySelector<HTMLDivElement>(
     '[data-download="preview-trigger"]'
   );
+  const downloadModalTrigger = document.querySelector<HTMLDivElement>(
+    '[data-download="modal-trigger"]'
+  );
   const downloadFolderTrigger = [
-    ...document.querySelectorAll<HTMLDivElement>('[data-download="folder"]'),
+    ...document.querySelectorAll<HTMLAnchorElement>('[data-download="folder"]'),
   ];
   const downloadAssetTrigger = [
-    ...document.querySelectorAll<HTMLDivElement>('[data-download="asset"]'),
+    ...document.querySelectorAll<HTMLAnchorElement>('[data-download="asset"]'),
   ];
   if (
     !downloadAllTrigger ||
     !downloadSelectedTrigger ||
-    !downloadModalTrigger ||
     !downloadPreviewTrigger ||
+    !downloadModalTrigger ||
     !downloadFolderTrigger ||
     !downloadAssetTrigger
   )
@@ -110,128 +107,128 @@ export const home = () => {
   }
 
   // download triggers
-  // all
-  downloadAllTrigger.addEventListener('click', () => {
-    const allInputs = getInputs(false);
-    const links = allInputs.map(
-      (input) => input.closest('[data-asset-parent]')?.querySelector('[data-download=link]')?.href
-    );
+  // // all
+  // downloadAllTrigger.addEventListener('click', () => {
+  //   const allInputs = getInputs(false);
+  //   const links = allInputs.map(
+  //     (input) => input.closest('[data-asset-parent]')?.querySelector('[data-download=link]')?.href
+  //   );
 
-    downloadAssetsFlow(links, 'all_realamericanhardwood.zip');
-  });
+  //   downloadAssetsFlow(links, 'all_realamericanhardwood.zip');
+  // });
 
-  // selected
-  downloadSelectedTrigger.addEventListener('click', () => {
-    const selectedInputs = getInputs(true);
-    const links = selectedInputs.map(
-      (input) => input.closest('[data-asset-parent]')?.querySelector('[data-download=link]')?.href
-    );
+  // // all
+  // downloadAllTrigger.addEventListener('click', () => {
+  //   downloadAssetsFlow([downloadAllTrigger.href], 'all_realamericanhardwood.zip');
+  // });
 
-    downloadAssetsFlow(links, 'selected_realamericanhardwood.zip');
-  });
+  // // selected
+  // downloadSelectedTrigger.addEventListener('click', () => {
+  //   // downloadAssetsFlow([downloadSelectedTrigger.href], 'selected_realamericanhardwood.zip');
+  // });
 
-  // folder
-  downloadFolderTrigger.forEach((trigger) => {
-    const parent = trigger.closest<HTMLDivElement>('[data-folder-level]');
-    if (!parent) return;
+  // // folder
+  // downloadFolderTrigger.forEach((trigger) => {
+  //   trigger.addEventListener('click', (event) => {
+  //     downloadAssetsFlow([trigger.href], 'folder_realamericanhardwood.zip');
+  //   });
+  // });
 
-    trigger.addEventListener('click', () => {
-      const inputs = getInputs(false, parent);
-      const links = inputs.map(
-        (input) =>
-          input.closest('[data-folder-parent]')?.querySelector('[data-download=link]')?.href
-      );
+  // // asset
+  // downloadAssetTrigger.forEach((trigger) => {
+  //   trigger.addEventListener('click', (event) => {
+  //     downloadAssetsFlow([trigger.href], 'asset_realamericanhardwood.zip');
+  //   });
+  // });
 
-      downloadAssetsFlow(links, 'folder_realamericanhardwood.zip');
-    });
-  });
+  // // get inputs
+  // function getInputs(
+  //   checked: boolean,
+  //   parent?: HTMLFormElement | HTMLDivElement
+  // ): HTMLInputElement[] {
+  //   // default the parent to the toolkit form if no parent exists
+  //   if (!parent) parent = toolkitBody;
+  //   if (!parent) return [];
 
-  // asset
-  downloadAssetTrigger.forEach((trigger) => {
-    const parent = trigger.closest<HTMLDivElement>('[data-asset-parent]');
-    if (!parent) return;
+  //   // get all inputs and return them if checked is false
+  //   const inputs = parent.querySelectorAll<HTMLInputElement>('input');
+  //   if (!checked) return [...inputs];
 
-    trigger.addEventListener('click', () => {
-      const inputs = getInputs(false, parent);
-      const links = inputs.map(
-        (input) =>
-          input.closest('[data-folder-parent]')?.querySelector('[data-download=link]')?.href
-      );
+  //   // get all checked inputs and return them if checked is true
+  //   const checkedInputs = [...inputs].filter((input) => input.checked);
+  //   return checkedInputs;
+  // }
 
-      downloadAssetsFlow(links, 'asset_realamericanhardwood.zip');
-    });
-  });
+  // // download flow
+  // function downloadAssetsFlow(fileUrls: string[], zipFileName = 'files.zip'): void {
+  //   // check if the form has been submitted
+  //   const hasSubmitted = localStorage.getItem('toolkitFormSubmitted');
 
-  // get inputs
-  function getInputs(
-    checked: boolean,
-    parent?: HTMLFormElement | HTMLDivElement
-  ): HTMLInputElement[] {
-    // default the parent to the toolkit form if no parent exists
-    if (!parent) parent = toolkitBody;
-    if (!parent) return [];
+  //   // download the assets if it has
+  //   if (hasSubmitted) {
+  //     downloadFiles(fileUrls, zipFileName);
+  //     return;
+  //   }
 
-    // get all inputs and return them if checked is false
-    const inputs = parent.querySelectorAll<HTMLInputElement>('input');
-    if (!checked) return [...inputs];
+  //   // open the form if not
+  //   simulateEvent(downloadModalTrigger, 'click');
 
-    // get all checked inputs and return them if checked is true
-    const checkedInputs = [...inputs].filter((input) => input.checked);
-    return checkedInputs;
-  }
+  //   // listen for form submission
+  //   toolkitForm?.addEventListener('submit', () => {
+  //     // save to local storage
+  //     localStorage.setItem('toolkitFormSubmitted', 'true');
 
-  // download flow
-  function downloadAssetsFlow(fileUrls: string[], zipFileName = 'files.zip'): void {
-    // check if the form has been submitted
-    const hasSubmitted = localStorage.getItem('toolkitFormSubmitted');
+  //     // download assets
+  //     downloadFiles(fileUrls, zipFileName);
+  //   });
+  // }
 
-    // download the assets if it has
-    if (hasSubmitted) {
-      downloadAssetsAsZip(fileUrls, zipFileName);
-      return;
-    }
+  // // download assets
+  // async function downloadFiles(assetUrls: string[], zipFileName?: string): Promise<void> {
+  //   const zip = new JSZip();
 
-    // open the form if not
-    simulateEvent(downloadModalTrigger, 'click');
+  //   for (const url of assetUrls) {
+  //     const response = await axios.get(url, { responseType: 'arraybuffer' });
+  //     const fileName = url.substring(url.lastIndexOf('/') + 1);
+  //     zip.file(fileName, response.data);
+  //   }
 
-    // listen for form submission
-    toolkitForm?.addEventListener('submit', () => {
-      // save to local storage
-      localStorage.setItem('toolkitFormSubmitted', 'true');
+  //   const content = await zip.generateAsync({ type: 'blob' });
+  //   const downloadUrl = URL.createObjectURL(content);
+  //   const link = document.createElement('a');
+  //   link.href = downloadUrl;
+  //   link.download = 'assets.zip';
+  //   link.click();
+  // }
 
-      // download assets
-      downloadAssetsAsZip(fileUrls, zipFileName);
-    });
-  }
+  // // download assets
+  // function downloadAssetsAsZip(fileUrls: string[], zipFileName = 'files.zip'): void {
+  //   alert('DOWNLOADING ASSETS');
+  // }
 
-  // download assets
-  function downloadAssetsAsZip(fileUrls: string[], zipFileName = 'files.zip'): void {
-    alert('DOWNLOADING ASSETS');
-  }
+  // // save function for future use
+  // async function downloadFilesAsZip(fileUrls: string[], zipFileName = 'files.zip'): Promise<void> {
+  //   const zip = new JSZip();
 
-  // save function for future use
-  async function downloadFilesAsZip(fileUrls: string[], zipFileName = 'files.zip'): Promise<void> {
-    const zip = new JSZip();
+  //   // Download each file and add it to the zip
+  //   const downloadPromises = fileUrls.map(async (url, index) => {
+  //     const response = await fetch(url);
+  //     if (!response.ok) {
+  //       throw new Error(`Failed to download file at ${url}`);
+  //     }
 
-    // Download each file and add it to the zip
-    const downloadPromises = fileUrls.map(async (url, index) => {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to download file at ${url}`);
-      }
+  //     const blob = await response.blob();
+  //     const fileName = `file_${index + 1}.${blob.type.split('/')[1]}`; // Create a generic file name with the correct extension
+  //     zip.file(fileName, blob);
+  //   });
 
-      const blob = await response.blob();
-      const fileName = `file_${index + 1}.${blob.type.split('/')[1]}`; // Create a generic file name with the correct extension
-      zip.file(fileName, blob);
-    });
+  //   // Wait for all files to be downloaded and added to the zip
+  //   await Promise.all(downloadPromises);
 
-    // Wait for all files to be downloaded and added to the zip
-    await Promise.all(downloadPromises);
-
-    // Generate the zip file and save it on the client's computer
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, zipFileName);
-  }
+  //   // Generate the zip file and save it on the client's computer
+  //   const zipBlob = await zip.generateAsync({ type: 'blob' });
+  //   saveAs(zipBlob, zipFileName);
+  // }
 
   // prep preview slider
   const splide = new Splide('.splide', {

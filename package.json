@@ -54,6 +54,7 @@
   "dependencies": {
     "@finsweet/ts-utils": "^0.39.1",
     "@splidejs/splide": "^4.1.4",
+    "axios": "^1.4.0",
     "file-saver": "^2.0.5",
     "fs": "0.0.1-security",
     "googleapis": "^118.0.0",
