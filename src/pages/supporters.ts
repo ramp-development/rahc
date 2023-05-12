@@ -12,7 +12,11 @@ export const supporters = () => {
 
     $target.load(`${$template.attr('href')} #target`, function () {
       numberLoaded += 1;
-      if (numberLoaded === $children.length) restartWebflow();
+      if (numberLoaded === $children.length) {
+        restartWebflow();
+        window.scrollBy(0, 1);
+        window.scrollBy(0, -1);
+      }
     });
   });
 };
