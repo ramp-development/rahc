@@ -4,24 +4,32 @@ import Splide from '@splidejs/splide';
 export const preview = () => {
   console.log('preview');
 
-  // get reference to elements
-  const previewModalTrigger = document.querySelector<HTMLDivElement>(
-    '[data-download-modal="preview"]'
-  );
-  const previewTriggers = [
-    ...document.querySelectorAll<HTMLDivElement>('[data-preview="folder"], [data-preview="asset"]'),
-  ];
-  const previewLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-preview="asset"]')];
+  // element selectors
+  const previewModalTriggerSelector = '[data-download-modal="preview"]',
+    previewTriggerSelector = '[data-preview]',
+    previewLinkSelector = '[data-preview="asset"]',
+    splideSelector = '.splide';
+
+  // global elements
+  const previewModalTrigger = document.querySelector<HTMLDivElement>(previewModalTriggerSelector),
+    previewTriggers = [...document.querySelectorAll<HTMLDivElement>(previewTriggerSelector)],
+    previewLinks = [...document.querySelectorAll<HTMLAnchorElement>(previewLinkSelector)];
+
   if (!previewModalTrigger || previewTriggers.length === 0 || previewLinks.length === 0) return;
 
-  // prep preview slider
-  const splide = new Splide('.splide', {
+  // splide options
+  const splideOptions = {
     pagination: false,
     perPage: 1,
     perMove: 1,
-  }).mount();
+  };
 
-  previewTriggers.forEach((trigger) => {
+  // prep preview slider
+  const splide = new Splide(splideSelector, splideOptions).mount();
+  previewTriggers.forEach((trigger) => setupPreview(trigger));
+
+  // setup preview
+  function setupPreview(trigger: HTMLDivElement) {
     const type = trigger.dataset.preview;
 
     trigger.addEventListener('click', (event) => {
@@ -33,17 +41,15 @@ export const preview = () => {
 
       if (type === 'folder') {
         const parent = trigger.closest<HTMLDivElement>('[data-folder-level]');
-        assetLink = parent?.querySelector<HTMLAnchorElement>('[data-preview="asset"]');
+        assetLink = parent?.querySelector<HTMLAnchorElement>(previewLinkSelector);
       }
 
-      const index = previewLinks.findIndex((link) => {
-        return link.href === assetLink.href;
-      });
-
+      const index = previewLinks.findIndex((link) => link.href === assetLink.href);
       simulateEvent(previewModalTrigger, 'click');
+
       setTimeout(() => {
         splide.go(index);
       }, 10);
     });
-  });
+  }
 };

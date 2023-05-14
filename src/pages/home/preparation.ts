@@ -1,18 +1,19 @@
 export const preparation = () => {
   console.log('preparation');
 
-  // get reference to elements
-  const toolkitForm = document.querySelector<HTMLFormElement>('.toolkit_form');
-  const toolkitBody = toolkitForm?.querySelector<HTMLDivElement>('[data-folder-body]');
-  const inputs = toolkitForm?.querySelectorAll<HTMLInputElement>('input');
-  if (!toolkitForm || !inputs) return;
+  // element selectors
+  const toolkitFormSelector = '.toolkit_form';
 
-  // // prep the download buttons
-  // toggleDownloadSelectedButton();
+  // global elements
+  const toolkitForm = document.querySelector<HTMLFormElement>(toolkitFormSelector);
+  if (!toolkitForm) return;
 
   // prep the folders
   const levels = ['master', 'sub', 'item'] as const;
-  levels.forEach((level) => {
+  levels.forEach(processLevel);
+
+  // process a level
+  function processLevel(level: string) {
     const isMaster = level === 'master';
     const levelFolders = [
       ...document.querySelectorAll<HTMLDivElement>(`[data-folder-level="${level}"]`),
@@ -20,60 +21,28 @@ export const preparation = () => {
 
     levelFolders.forEach((levelFolder) => {
       const item = levelFolder.dataset.folderItem;
-      const body = isMaster
-        ? levelFolder
-        : levelFolder.querySelector<HTMLDivElement>('[data-folder-body]');
-      if (!body) return;
-
-      //   find and append folders
-      const childFolders = [
-        ...document.querySelectorAll<HTMLDivElement>(`[data-folder-parent="${item}"]`),
-      ];
-      childFolders.forEach((childFolder) => {
-        body.append(childFolder);
-      });
-
-      //   find and append assets
-      const assets = [
-        ...document.querySelectorAll<HTMLDivElement>(`[data-asset-parent="${item}"]`),
-      ];
-      assets.forEach((asset) => {
-        body.append(asset);
-      });
+      processLevelFolder(levelFolder, isMaster, item);
     });
-  });
-
-  // handle checkbox change
-  inputs?.forEach((input) => {
-    input.addEventListener('change', () => {
-      toggleInputActiveState(input);
-      // toggleDownloadSelectedButton();
-    });
-  });
-
-  // apply active state to checkbox
-  function toggleInputActiveState(input: HTMLInputElement) {
-    const icon = input.parentElement?.querySelector<HTMLDivElement>('.toolkit-assets_icon');
-    if (!icon) return;
-
-    const isChecked = input.checked;
-    if (isChecked) {
-      icon.style.display = 'block';
-    } else {
-      icon?.style.removeProperty('display');
-    }
   }
 
-  // // handle download buttons
-  // function toggleDownloadSelectedButton() {
-  //   if (!downloadSelectedTrigger) return;
+  // process a level folder
+  function processLevelFolder(levelFolder: HTMLDivElement, isMaster: boolean, item: string) {
+    const body = isMaster
+      ? levelFolder
+      : levelFolder.querySelector<HTMLDivElement>('[data-folder-body]');
 
-  //   const checkedInputs = [...inputs].filter((input) => input.checked);
+    if (!body) return;
 
-  //   if (checkedInputs.length > 0) {
-  //     downloadSelectedTrigger.style.removeProperty('display');
-  //   } else {
-  //     downloadSelectedTrigger.style.display = 'none';
-  //   }
-  // }
+    // find and append folders
+    appendToParent(body, 'data-folder-parent', item);
+
+    // find and append assets
+    appendToParent(body, 'data-asset-parent', item);
+  }
+
+  // append to parent
+  function appendToParent(parent: HTMLDivElement, selector: string, item: string) {
+    const elements = [...document.querySelectorAll<HTMLDivElement>(`[${selector}="${item}"]`)];
+    elements.forEach((element) => parent.append(element));
+  }
 };
