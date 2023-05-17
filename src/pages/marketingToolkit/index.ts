@@ -2,8 +2,8 @@ import { download } from './download';
 import { preparation } from './preparation';
 import { preview } from './preview';
 
-export const home = () => {
-  console.log('home');
+export const marketingToolkit = () => {
+  console.log('marketingToolkit');
 
   preparation();
   download();

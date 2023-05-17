@@ -9339,10 +9339,10 @@
     });
   };
 
-  // src/pages/home/index.ts
+  // src/pages/marketingToolkit/index.ts
   init_live_reload();
 
-  // src/pages/home/download.ts
+  // src/pages/marketingToolkit/download.ts
   init_live_reload();
 
   // node_modules/.pnpm/axios@1.4.0/node_modules/axios/index.js
@@ -11530,7 +11530,7 @@
     mergeConfig: mergeConfig2
   } = axios_default;
 
-  // src/pages/home/download.ts
+  // src/pages/marketingToolkit/download.ts
   var import_jszip = __toESM(require_jszip_min(), 1);
   var download = () => {
     console.log("download");
@@ -11656,7 +11656,7 @@
     }
   };
 
-  // src/pages/home/preparation.ts
+  // src/pages/marketingToolkit/preparation.ts
   init_live_reload();
   var preparation = () => {
     console.log("preparation");
@@ -11689,7 +11689,7 @@
     }
   };
 
-  // src/pages/home/preview.ts
+  // src/pages/marketingToolkit/preview.ts
   init_live_reload();
 
   // node_modules/.pnpm/@splidejs+splide@4.1.4/node_modules/@splidejs/splide/dist/js/splide.esm.js
@@ -14265,7 +14265,7 @@
   Splide.defaults = {};
   Splide.STATES = STATES;
 
-  // src/pages/home/preview.ts
+  // src/pages/marketingToolkit/preview.ts
   var preview = () => {
     console.log("preview");
     const previewModalTriggerSelector = '[data-download-modal="preview"]', previewTriggerSelector = "[data-preview]", previewLinkSelector = '[data-preview="asset"]', splideSelector = ".splide";
@@ -14299,9 +14299,9 @@
     }
   };
 
-  // src/pages/home/index.ts
-  var home = () => {
-    console.log("home");
+  // src/pages/marketingToolkit/index.ts
+  var marketingToolkit = () => {
+    console.log("marketingToolkit");
     preparation();
     download();
     preview();
@@ -14332,20 +14332,16 @@
   var pages = () => {
     console.log("pages");
     const { pathname } = window.location;
-    switch (pathname) {
-      case "/":
-        home();
-        break;
-      case "/how-to-get-involved":
-        getInvolved();
-        break;
-      case "/make-a-contribution":
-        contribution();
-        break;
-      case "/financial-supporters":
-        supporters();
-        break;
-    }
+    if (!pathname.includes("/industry/"))
+      return;
+    if (pathname.includes("marketing-toolkit"))
+      return marketingToolkit();
+    if (pathname.includes("how-to-get-involved"))
+      return getInvolved();
+    if (pathname.includes("make-a-contribution"))
+      return contribution();
+    if (pathname.includes("financial-supporters"))
+      return supporters();
   };
 
   // src/index.ts
