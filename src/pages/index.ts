@@ -7,7 +7,7 @@ export const pages = () => {
   console.log('pages');
   const { pathname } = window.location;
 
-  if (!pathname.includes('/industry/')) return;
+  if (!pathname.includes('/industry')) return;
   if (pathname.includes('marketing-toolkit')) return marketingToolkit();
   if (pathname.includes('how-to-get-involved')) return getInvolved();
   if (pathname.includes('make-a-contribution')) return contribution();

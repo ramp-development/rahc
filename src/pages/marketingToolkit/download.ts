@@ -104,6 +104,7 @@ export const download = () => {
   // trigger click handler
   function handleTriggerClick(trigger: HTMLAnchorElement) {
     trigger.addEventListener('click', (event) => {
+      console.log('trigger');
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
