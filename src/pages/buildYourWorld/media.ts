@@ -7,7 +7,7 @@ export const media = () => {
 
   const videoSlider = new Splide(videoSplide, {
     perPage: 1,
-    type: 'loop',
+    // type: '',
     arrows: false,
     pagination: false,
   });
@@ -35,12 +35,41 @@ export const media = () => {
   videoSlider.mount();
   thumbnailSlider.mount();
 
-  const videoSlides = videoSlider.Components.Elements.slides;
-  function videoActive(slug: string): void {
-    const slide = videoSlides.find((slide) => slide.dataset.splideSlide === slug);
-    const index = videoSlides.indexOf(slide);
+  class VideoSlide {
+    public slide: HTMLElement;
+    public id: string;
+    public index: number;
+    public embed: HTMLIFrameElement;
+    private src: string;
 
-    videoSlider.go(`>${index}`);
+    constructor(slide: HTMLElement, index: number) {
+      this.slide = slide;
+      this.id = slide.dataset.splideSlide;
+      this.index = index;
+      this.embed = slide.querySelector('iframe');
+      this.src = this.embed.src;
+    }
+
+    pause(): void {
+      this.embed.src = '';
+    }
+
+    makeActive(): void {
+      videoSlider.go(this.index);
+      this.embed.src = this.src;
+    }
+  }
+
+  const videoSlides = videoSlider.Components.Elements.slides.map((slide, index) => {
+    return new VideoSlide(slide, index);
+  });
+
+  console.log(videoSlides);
+
+  function videoActive(slug: string): void {
+    videoSlides.forEach((slide) => slide.pause());
+    const slide = videoSlides.find((slide) => slide.id === slug);
+    slide.makeActive();
   }
 
   const firstSlide = thumbnailSlider.Components.Elements.slides[0];
