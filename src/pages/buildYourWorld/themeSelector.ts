@@ -21,10 +21,20 @@ export const themeSelector = () => {
   if (!initialTheme) return;
 
   filterItems.forEach((item) => item.themeVisibility(initialTheme));
+  const customEvent = new CustomEvent('updateLocoScroll');
+  setTimeout(() => {
+    document.dispatchEvent(customEvent);
+  }, 500);
 
   selector.on('active', (e) => {
     const theme = e.slide.textContent;
     if (!theme) return;
     filterItems.forEach((item) => item.themeVisibility(theme));
+    setTimeout(() => {
+      document.dispatchEvent(customEvent);
+    }, 500);
+    setTimeout(() => {
+      document.dispatchEvent(customEvent);
+    }, 1000);
   });
 };
