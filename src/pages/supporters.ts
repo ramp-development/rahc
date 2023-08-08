@@ -1,8 +1,6 @@
 import { restartWebflow } from '@finsweet/ts-utils';
 
 export const supporters = () => {
-  console.log('supporters');
-
   const $list = $('[data-nest="list"]');
   const $children = $list.children();
   let numberLoaded = 0;

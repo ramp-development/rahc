@@ -1,3 +1,1 @@
-export const contribution = () => {
-  console.log('contribution');
-};
+export const contribution = () => {};

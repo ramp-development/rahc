@@ -3,8 +3,6 @@ import axios from 'axios';
 import JSZip from 'jszip';
 
 export const download = () => {
-  console.log('download');
-
   // element selectors
   const downloadFormSelector = '[data-download-form]',
     assetFormSelector = '[data-asset-form]',
@@ -104,7 +102,6 @@ export const download = () => {
   // trigger click handler
   function handleTriggerClick(trigger: HTMLAnchorElement) {
     trigger.addEventListener('click', (event) => {
-      console.log('trigger');
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();

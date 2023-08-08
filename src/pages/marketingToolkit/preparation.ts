@@ -1,6 +1,4 @@
 export const preparation = () => {
-  console.log('preparation');
-
   // element selectors
   const toolkitFormSelector = '.toolkit_form';
 

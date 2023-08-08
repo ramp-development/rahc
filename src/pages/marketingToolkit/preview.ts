@@ -2,8 +2,6 @@ import { simulateEvent } from '@finsweet/ts-utils';
 import Splide from '@splidejs/splide';
 
 export const preview = () => {
-  console.log('preview');
-
   // element selectors
   const previewModalTriggerSelector = '[data-download-modal="preview"]',
     previewTriggerSelector = '[data-preview]',
